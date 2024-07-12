@@ -16,6 +16,7 @@ import tarfile
 import pickle
 import os
 from PIL import Image
+from sklearn.model_selection import train_test_split
 
 ################## UPLOAD THE DATA ##################
 url = "https://www.cs.toronto.edu/~kriz/cifar-10-python.tar.gz"
@@ -101,3 +102,85 @@ def display_cifar_images(num, dataset_path='./cifar-10-batches-py'):
     plt.tight_layout()
     plt.show()
 
+# todo - check this function
+def load_and_prepare_cifar_data(dataset_path='./cifar-10-batches-py'):
+    """
+    Loads and preprocesses the CIFAR-10 dataset from the specified directory.
+
+    :param: dataset_path :  optional -
+        The path to the CIFAR-10 dataset folder. Default is './cifar-10-batches-py'.
+
+    :returns: pd.DataFrame
+        A DataFrame containing the flattened image data and their corresponding labels.
+    """
+    data_list = []
+
+    # Loop through each batch file and load the data
+    for i in range(1, 6):
+        batch_file_path = os.path.join(dataset_path, f'data_batch_{i}')
+        batch_data = load_cifar_batch(batch_file_path)
+
+        # Extract the pixel data and labels from the batch
+        pixel_data = batch_data[b'data']
+        labels = batch_data[b'labels']
+
+        # Reshape the pixel data into image format
+        images = pixel_data.reshape((-1, 3, 32, 32)).transpose(0, 2, 3, 1)
+
+        # Flatten the images as feature vectors
+        num_images = images.shape[0]
+        image_size = images.shape[1] * images.shape[2] * images.shape[3]
+        flattened_images = images.reshape(num_images, image_size)
+
+        # Create a DataFrame with flattened images and labels
+        df_batch = pd.DataFrame(flattened_images)
+        df_batch['label'] = labels
+
+        # Append the batch data to the data_list
+        data_list.append(df_batch)
+
+    # Concatenate all batch DataFrames into a single DataFrame
+    df = pd.concat(data_list, ignore_index=True)
+
+    return df
+
+# df = load_and_prepare_cifar_data()
+# print(df)
+
+def split_data(df, test_size=0.2):
+    """
+    Splits the DataFrame into training and testing datasets.
+
+    :param: df : pd.DataFrame
+        The DataFrame containing the flattened image data and their corresponding labels.
+    :param: test_size : float, optional
+        The proportion of the dataset to include in the test split. Default is 0.2.
+
+    :returns: tuple
+        A tuple containing four elements:
+            - X_train: Training feature vectors.
+            - X_test: Testing feature vectors.
+            - y_train: Training labels.
+            - y_test: Testing labels.
+    """
+    X = df.drop('label', axis=1)
+    y = df['label']
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=42)
+    return X_train, X_test, y_train, y_test
+
+if __name__ == '__main__':
+    df = load_and_prepare_cifar_data()
+    X_train, X_test, y_train, y_test = split_data(df)
+
+    # Print the shapes of the resulting datasets
+    # print(f"X_train shape: {X_train.shape}")
+    # print(f"X_test shape: {X_test.shape}")
+    # print(f"y_train shape: {y_train.shape}")
+    # print(f"y_test shape: {y_test.shape}")
+
+    #| output:
+    # X_train shape: (40000, 3072)
+    # X_test shape: (10000, 3072)
+    # y_train shape: (40000,)
+    # y_test shape: (10000,)
+    # |#
