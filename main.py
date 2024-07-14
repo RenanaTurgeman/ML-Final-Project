@@ -9,8 +9,6 @@ Since: 2024-07
 
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
-import seaborn as sns
 import requests
 import tarfile
 import pickle
@@ -25,6 +23,7 @@ import seaborn as sns
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import classification_report
 from sklearn.preprocessing import StandardScaler
+from sklearn.svm import SVC
 
 # Class names for CIFAR-10
 CLASS_NAMES = ['airplane', 'automobile', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse', 'ship', 'truck']
@@ -114,6 +113,7 @@ def display_cifar_images(num, dataset_path='./cifar-10-batches-py'):
     plt.tight_layout()
     plt.show()
 
+
 # todo - check this function
 def load_and_prepare_cifar_data(dataset_path='./cifar-10-batches-py'):
     """
@@ -155,6 +155,7 @@ def load_and_prepare_cifar_data(dataset_path='./cifar-10-batches-py'):
     df = pd.concat(data_list, ignore_index=True)
 
     return df
+
 
 # df = load_and_prepare_cifar_data()
 # print(df)
@@ -199,6 +200,7 @@ def plot_confusion_matrix(y_true, y_pred, class_names):
     plt.ylabel('True Labels')
     plt.title('Confusion Matrix')
     plt.show()
+
 
 ########## SIMPLE MODELS ##########
 
@@ -288,6 +290,102 @@ def logistic_regression(X_train, X_val, X_test, y_train, y_val, y_test):
 
     return best_model_pred_val
 
+
+def svm_classifier(X_train, X_val, X_test, y_train, y_val, y_test, ):
+    """
+    Trains and evaluates SVM models with different kernels and C values on the provided datasets.
+
+    Parameters:
+    :param: X_train : Training data features.
+    :param: X_val : Validation data features.
+    :param: X_test : Test data features.
+    :param: y_train : Training data labels.
+    :param: y_val : Validation data labels.
+    :param: y_test : Test data labels.
+    :param: kernels : List of kernels to be used by SVM.
+    :param: C_values : List of C values to be used by SVM.
+
+    :returns: None
+    """
+    # best_val_accuracy = 0
+    # best_model_pred_val = None
+    # best_kernel = None
+    # best_C = None
+    #
+    # kernels = ['poly', 'rbf']
+    # C_values = [0.1, 1.0, 3.5, 5.0]
+    #
+    # for kernel in kernels:
+    #     for C in C_values:
+    #         # Initialize the SVM model
+    #         model_svm = SVC(kernel=kernel, C=C)
+    #
+    #         # Fit the model to the training data
+    #         model_svm.fit(X_train, y_train)
+    #
+    #         # Predict the validation and test data
+    #         model_svm_pred_val = model_svm.predict(X_val)
+    #         model_svm_pred_test = model_svm.predict(X_test)
+    #
+    #         # Calculate and print accuracy
+    #         val_accuracy = accuracy_score(y_val, model_svm_pred_val)
+    #         test_accuracy = accuracy_score(y_test, model_svm_pred_test)
+    #
+    #         print(
+    #             f"Kernel = {kernel}, C = {C}: Validation Accuracy = {val_accuracy:.4f}, Test Accuracy = {test_accuracy:.4f}")
+    #
+    #         # Keep track of the best model based on validation accuracy
+    #         if val_accuracy > best_val_accuracy:
+    #             best_val_accuracy = val_accuracy
+    #             best_model_pred_val = model_svm_pred_val
+    #             best_kernel = kernel
+    #             best_C = C
+    #
+    # print(f"Best Kernel: {best_kernel}, Best C: {best_C}, Best Validation Accuracy: {best_val_accuracy:.4f}")
+    #
+    # # Plot the confusion matrix for the best model
+    # plot_confusion_matrix(y_val, best_model_pred_val, CLASS_NAMES)
+    accuracy = []
+    Kernel = ['poly', 'rbf']
+    c = [0.1, 1.0, 2.0, 5.0]
+    accuracy_scores = {kernel: {'train': [], 'val': []} for kernel in Kernel}
+
+    for i in range(len(Kernel)):
+        for j in range(len(c)):
+            # Initialize the SVM classifier
+            SVM = SVC(max_iter=10000, kernel=Kernel[i], C=c[j])
+
+            # Fit the SVM classifier on the training data
+            SVM.fit(X_train, y_train)
+
+            # Make predictions on the validation data
+            val_pred = SVM.predict(X_val)
+            model_svm_t = SVM.predict(X_train)
+
+            # Calculate the accuracy score
+            svm_acc = accuracy_score(y_val, val_pred)
+            acc_svm_t = accuracy_score(y_train, model_svm_t)
+            accuracy_scores[Kernel[i]]['val'].append(svm_acc)
+            accuracy_scores[Kernel[i]]['train'].append(acc_svm_t)
+
+            print("Validation:")
+            print(Kernel[i], 'kernel with', c[j], 'Regularization parameter gave score of:', svm_acc)
+            print("Train:")
+            print(Kernel[i], 'kernel with', c[j], 'Regularization parameter gave score of:', acc_svm_t)
+
+        # Create a plot for each kernel (validation accuracy)
+        plt.figure(figsize=(10, 6))
+        plt.plot(c, accuracy_scores[Kernel[i]]['val'], marker='o', label=Kernel[i] + ' (Validation)')
+        plt.plot(c, accuracy_scores[Kernel[i]]['train'], marker='x', label=Kernel[i] + ' (Train)')
+        plt.title('SVM Accuracy for ' + Kernel[i] + ' Kernel')
+        plt.xlabel('Regularization Parameter (C)')
+        plt.ylabel('Accuracy')
+        plt.xticks(c)
+        plt.legend()
+        plt.grid(True)
+        plt.show()
+    return val_pred
+
 if __name__ == '__main__':
     df = load_and_prepare_cifar_data()
     X_train, X_test, y_train, y_test = split_data(df)
@@ -336,10 +434,17 @@ if __name__ == '__main__':
     # plot_confusion_matrix(y_val, model_knn_pred, CLASS_NAMES)
 
     ###################### Logistic Regression ######################
+    #
+    # # Train Logistic Regression and get predictions
+    # model_lr_pred = logistic_regression(X_train_rgb, X_val_rgb, X_test_rgb, y_train, y_val, y_test)
+    #
+    # # Plot the confusion matrix
+    # plot_confusion_matrix(y_val, model_lr_pred, CLASS_NAMES)
 
-    # Train Logistic Regression and get predictions
-    model_lr_pred = logistic_regression(X_train_rgb, X_val_rgb, X_test_rgb, y_train, y_val, y_test)
+    ###################### SVM ######################
+
+    # Train SVM and get predictions
+    model_svm_pred = svm_classifier(X_train_rgb, X_val_rgb, X_test_rgb, y_train, y_val, y_test)
 
     # Plot the confusion matrix
-    plot_confusion_matrix(y_val, model_lr_pred, CLASS_NAMES)
-
+    plot_confusion_matrix(y_val, model_svm_pred, CLASS_NAMES)
