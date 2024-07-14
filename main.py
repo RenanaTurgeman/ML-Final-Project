@@ -62,6 +62,7 @@ def normalize_data(train, val, test):
     train = train / 255.0
     val = val / 255.0
     test = test / 255.0
+    return train, val, test
 
 
 def display_cifar_images(num, dataset_path='./cifar-10-batches-py'):
@@ -168,6 +169,56 @@ def split_data(df, test_size=0.2):
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=42)
     return X_train, X_test, y_train, y_test
 
+########## SIMPLE MODELS ##########
+
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.metrics import accuracy_score
+import matplotlib.pyplot as plt
+
+
+def KNN(train, val, y_train, y_val):
+    """
+    Performs K-Nearest Neighbors classification on the provided training and validation datasets.
+
+    :param train: The training feature vectors.
+    :param val: The validation feature vectors.
+    :param y_train: The labels for the training feature vectors.
+    :param y_val: The labels for the validation feature vectors.
+
+    :return: The predictions for the validation set.
+    """
+    accuracy = []
+
+    # Test odd values for n_neighbors from 1 to 15
+    for i in range(1, 15, 2):
+        # Initialize the KNN model
+        model_knn = KNeighborsClassifier(n_neighbors=i)
+
+        # Fit the model on the training data
+        model_knn.fit(train, y_train)
+
+        # Predict on the validation data
+        model_knn_pred = model_knn.predict(val)
+
+        # Calculate accuracy
+        acc_knn = accuracy_score(y_val, model_knn_pred)
+        accuracy.append(round(acc_knn, 3) * 100)
+
+    # Find the best accuracy and corresponding number of neighbors
+    best_index = accuracy.index(max(accuracy)) + 1
+    print(f"The Accuracy score for {best_index} nearest neighbors is: {max(accuracy)}%")
+
+    # Plot the accuracy against the number of neighbors
+    plt.plot(range(1, 15, 2), accuracy)
+    plt.xlabel('Number of Neighbors')
+    plt.ylabel('Accuracy (%)')
+    plt.title('KNN Accuracy vs. Number of Neighbors')
+    plt.grid()
+    plt.show()
+
+    return model_knn_pred
+
+
 if __name__ == '__main__':
     df = load_and_prepare_cifar_data()
     X_train, X_test, y_train, y_test = split_data(df)
@@ -184,3 +235,22 @@ if __name__ == '__main__':
     # y_train shape: (40000,)
     # y_test shape: (10000,)
     # |#
+
+    # Split the training data into training and validation sets
+    X_train, X_val, y_train, y_val = train_test_split(X_train, y_train, test_size=0.25, random_state=42)
+
+    # Normalize the data
+    normalize_data(X_train, X_val, X_test)
+
+    # Reshape the data
+    X_train_rgb = X_train.to_numpy().reshape(X_train.shape[0], -1)
+    X_val_rgb = X_val.to_numpy().reshape(X_val.shape[0], -1)
+    X_test_rgb = X_test.to_numpy().reshape(X_test.shape[0], -1)
+
+    # Convert labels from a 2D array to 1D array
+    y_train = np.squeeze(y_train)
+    y_val = np.squeeze(y_val)
+    y_test = np.squeeze(y_test)
+
+    # Run KNN and get predictions
+    model_knn_pred = KNN(X_train_rgb, X_val_rgb, y_train, y_val)
