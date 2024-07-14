@@ -264,9 +264,9 @@ def logistic_regression(X_train, X_val, X_test, y_train, y_val, y_test):
     best_val_accuracy = 0
     best_model_pred_val = None
 
-    for max_iter in max_iter_values:
+    for iter in max_iter_values:
         # Initialize the Logistic Regression model
-        model_lr = LogisticRegression(max_iter=max_iter, solver='lbfgs')
+        model_lr = LogisticRegression(max_iter=iter, solver='lbfgs')
 
         # Fit the model to the training data
         model_lr.fit(X_train, y_train)
@@ -279,7 +279,7 @@ def logistic_regression(X_train, X_val, X_test, y_train, y_val, y_test):
         val_accuracy = accuracy_score(y_val, model_lr_pred_val)
         test_accuracy = accuracy_score(y_test, model_lr_pred_test)
 
-        print(f"Max_iter = {max_iter}: Validation Accuracy = {val_accuracy:.4f}, Test Accuracy = {test_accuracy:.4f}")
+        print(f"iter = {iter}: Validation Accuracy = {val_accuracy:.4f}, Test Accuracy = {test_accuracy:.4f}")
 
         # Keep track of the best model based on validation accuracy
         if val_accuracy > best_val_accuracy:
@@ -337,9 +337,9 @@ if __name__ == '__main__':
 
     ###################### Logistic Regression ######################
 
-    # Train Logistic Regression and get predictions
-    model_lr_pred = logistic_regression(X_train_rgb, X_val_rgb, X_test_rgb, y_train, y_val, y_test)
-
-    # Plot the confusion matrix
-    plot_confusion_matrix(y_val, model_lr_pred, CLASS_NAMES)
+    # # Train Logistic Regression and get predictions
+    # model_lr_pred = logistic_regression(X_train_rgb, X_val_rgb, X_test_rgb, y_train, y_val, y_test)
+    #
+    # # Plot the confusion matrix
+    # plot_confusion_matrix(y_val, model_lr_pred, CLASS_NAMES)
 
