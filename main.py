@@ -259,19 +259,34 @@ def logistic_regression(X_train, X_val, X_test, y_train, y_val, y_test):
 
     :returns: Predictions for the validation data using the best model.
     """
-    for i in range(20, 150, 30):
-        model_lr = LogisticRegression(max_iter=i)
-        model_lr_fit = model_lr.fit(X_train, y_train)
-        model_lr_pred = model_lr.predict(X_val)
-        model_lr_t = model_lr.predict(X_train)
-        # Accuracy of Model
-        acc_lr = accuracy_score(y_val, model_lr_pred)
-        acc_lr_t = accuracy_score(y_train, model_lr_t)
-        print(str(i) + " iterations: Validation set - The Accuracy score is: " + str(round(acc_lr, 3) * 100) + "%")
+    # Define a list of max_iter values
+    max_iter_values = [100, 500, 1000, 1500, 2000]
+    best_val_accuracy = 0
+    best_model_pred_val = None
 
-        print(str(i) + " iterations: Training set - The Accuracy score is: " + str(round(acc_lr_t, 3) * 100) + "%")
+    for max_iter in max_iter_values:
+        # Initialize the Logistic Regression model
+        model_lr = LogisticRegression(max_iter=max_iter, solver='lbfgs')
 
-    return model_lr_pred
+        # Fit the model to the training data
+        model_lr.fit(X_train, y_train)
+
+        # Predict the validation and test data
+        model_lr_pred_val = model_lr.predict(X_val)
+        model_lr_pred_test = model_lr.predict(X_test)
+
+        # Calculate and print accuracy
+        val_accuracy = accuracy_score(y_val, model_lr_pred_val)
+        test_accuracy = accuracy_score(y_test, model_lr_pred_test)
+
+        print(f"Max_iter = {max_iter}: Validation Accuracy = {val_accuracy:.4f}, Test Accuracy = {test_accuracy:.4f}")
+
+        # Keep track of the best model based on validation accuracy
+        if val_accuracy > best_val_accuracy:
+            best_val_accuracy = val_accuracy
+            best_model_pred_val = model_lr_pred_val
+
+    return best_model_pred_val
 
 if __name__ == '__main__':
     df = load_and_prepare_cifar_data()
