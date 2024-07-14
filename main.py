@@ -26,6 +26,7 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import classification_report
 from sklearn.preprocessing import StandardScaler
 from sklearn.svm import SVC
+from sklearn.tree import DecisionTreeClassifier
 
 # Class names for CIFAR-10
 CLASS_NAMES = ['airplane', 'automobile', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse', 'ship', 'truck']
@@ -387,6 +388,38 @@ def svm_classifier(X_train, X_val, X_test, y_train, y_val, y_test, ):
         plt.grid(True)
         plt.show()
     return val_pred
+def decision_tree(X_train, X_val, X_test, y_train, y_val, y_test):
+    """
+    Trains and evaluates a Decision Tree model on the provided datasets.
+
+    Parameters:
+    :param: X_train : Training data features.
+    :param: X_val : Validation data features.
+    :param: X_test : Test data features.
+    :param: y_train : Training data labels.
+    :param: y_val : Validation data labels.
+    :param: y_test : Test data labels.
+
+    Returns:
+    np.ndarray: Predictions for the validation data using the best model.
+    """
+    # Initialize the Decision Tree model
+    model_dt = DecisionTreeClassifier(random_state=42)
+
+    # Fit the model to the training data
+    model_dt.fit(X_train, y_train)
+
+    # Predict the validation and test data
+    model_dt_pred_val = model_dt.predict(X_val)
+    model_dt_pred_test = model_dt.predict(X_test)
+
+    # Calculate and print accuracy
+    val_accuracy = accuracy_score(y_val, model_dt_pred_val)
+    test_accuracy = accuracy_score(y_test, model_dt_pred_test)
+
+    print(f"Validation Accuracy = {val_accuracy:.4f}, Test Accuracy = {test_accuracy:.4f}")
+
+    return model_dt_pred_val
 
 if __name__ == '__main__':
     df = load_and_prepare_cifar_data()
@@ -445,8 +478,15 @@ if __name__ == '__main__':
 
     ###################### SVM ######################
 
-    # Train SVM and get predictions
-    model_svm_pred = svm_classifier(X_train_rgb, X_val_rgb, X_test_rgb, y_train, y_val, y_test)
+    # # Train SVM and get predictions
+    # model_svm_pred = svm_classifier(X_train_rgb, X_val_rgb, X_test_rgb, y_train, y_val, y_test)
+    #
+    # # Plot the confusion matrix
+    # plot_confusion_matrix(y_val, model_svm_pred, CLASS_NAMES)
+
+    ############### Decision Tree ######################
+    # Train Decision Tree and get predictions
+    model_dt_pred = decision_tree(X_train_rgb, X_val_rgb, X_test_rgb, y_train, y_val, y_test)
 
     # Plot the confusion matrix
-    plot_confusion_matrix(y_val, model_svm_pred, CLASS_NAMES)
+    plot_confusion_matrix(y_val, model_dt_pred, CLASS_NAMES)
