@@ -17,6 +17,11 @@ import pickle
 import os
 from PIL import Image
 from sklearn.model_selection import train_test_split
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.metrics import accuracy_score
+import matplotlib.pyplot as plt
+from sklearn.metrics import confusion_matrix
+import seaborn as sns
 
 ################## UPLOAD THE DATA ##################
 url = "https://www.cs.toronto.edu/~kriz/cifar-10-python.tar.gz"
@@ -169,12 +174,27 @@ def split_data(df, test_size=0.2):
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=42)
     return X_train, X_test, y_train, y_test
 
+
+def plot_confusion_matrix(y_true, y_pred, class_names):
+    """
+    Plots the confusion matrix for the given true labels and predicted labels.
+
+    Parameters:
+    y_true: True labels.
+    y_pred: Predicted labels.
+    class_names: List of class names.
+    """
+    cm = confusion_matrix(y_true, y_pred)
+
+    # Plot the confusion matrix using seaborn
+    plt.figure(figsize=(10, 7))
+    sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', xticklabels=class_names, yticklabels=class_names)
+    plt.xlabel('Predicted Labels')
+    plt.ylabel('True Labels')
+    plt.title('Confusion Matrix')
+    plt.show()
+
 ########## SIMPLE MODELS ##########
-
-from sklearn.neighbors import KNeighborsClassifier
-from sklearn.metrics import accuracy_score
-import matplotlib.pyplot as plt
-
 
 def KNN(train, val, y_train, y_val):
     """
@@ -254,3 +274,9 @@ if __name__ == '__main__':
 
     # Run KNN and get predictions
     model_knn_pred = KNN(X_train_rgb, X_val_rgb, y_train, y_val)
+
+    # Class names for CIFAR-10
+    class_names = ['airplane', 'automobile', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse', 'ship', 'truck']
+
+    # Plot the confusion matrix
+    plot_confusion_matrix(y_val, model_knn_pred, class_names)
