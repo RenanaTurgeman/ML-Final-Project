@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 from sklearn.linear_model import LogisticRegression
 from sklearn.svm import SVC
 from sklearn.tree import DecisionTreeClassifier
-
+from sklearn.model_selection import GridSearchCV
 def KNN(train, val, y_train, y_val):
     """
     Performs K-Nearest Neighbors classification on the provided training and validation datasets.
@@ -106,6 +106,7 @@ def SVM(X_train, X_val, X_test, y_train, y_val, y_test, ):
 
     :returns: None
     """
+
     best_val_accuracy = 0
     best_model_pred_val = None
     best_kernel = None
@@ -141,6 +142,46 @@ def SVM(X_train, X_val, X_test, y_train, y_val, y_test, ):
                 best_C = C
 
     print(f"Best Kernel: {best_kernel}, Best C: {best_C}, Best Validation Accuracy: {best_val_accuracy:.4f}")
+
+
+
+def SVM_with_GridSearchCV(X_train, y_train, subsample_size=5000):
+    """
+    Trains and evaluates SVM models with different kernels and C values on the provided datasets using a subsample.
+
+    Parameters:
+    :param: X_train : Training data features.
+    :param: y_train : Training data labels.
+    :param: kernels : List of kernels to be used by SVM.
+    :param: C_values : List of C values to be used by SVM.
+    :param: subsample_size : Size of the subsample to use for faster model selection.
+
+    :returns: The best model and its validation accuracy.
+    """
+    kernels = ['poly', 'rbf']
+    C_values = [0.1, 1.0, 3.5, 5.0]
+
+    # Subsample the data
+    if len(X_train) > subsample_size:
+        X_train_subsample = X_train[:subsample_size]
+        y_train_subsample = y_train[:subsample_size]
+    else:
+        X_train_subsample = X_train
+        y_train_subsample = y_train
+
+    param_grid = {'C': C_values, 'kernel': kernels}
+
+    # Initialize the SVM model with GridSearchCV
+    grid_search = GridSearchCV(SVC(), param_grid, cv=3, n_jobs=-1, verbose=2)
+    grid_search.fit(X_train_subsample, y_train_subsample)
+
+    best_model = grid_search.best_estimator_
+    best_val_accuracy = grid_search.best_score_
+    best_params = grid_search.best_params_
+
+    print(f"Best Kernel: {best_params['kernel']}, Best C: {best_params['C']}, Best Validation Accuracy: {best_val_accuracy:.4f}")
+
+    return best_model, best_val_accuracy
 
 def decision_tree(X_train, X_val, X_test, y_train, y_val, y_test):
     """
