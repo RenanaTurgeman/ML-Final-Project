@@ -22,6 +22,12 @@ from sklearn.metrics import accuracy_score
 import matplotlib.pyplot as plt
 from sklearn.metrics import confusion_matrix
 import seaborn as sns
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import classification_report
+from sklearn.preprocessing import StandardScaler
+
+# Class names for CIFAR-10
+CLASS_NAMES = ['airplane', 'automobile', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse', 'ship', 'truck']
 
 ################## UPLOAD THE DATA ##################
 url = "https://www.cs.toronto.edu/~kriz/cifar-10-python.tar.gz"
@@ -239,6 +245,34 @@ def KNN(train, val, y_train, y_val):
     return model_knn_pred
 
 
+def logistic_regression(X_train, X_val, X_test, y_train, y_val, y_test):
+    """
+    Trains and evaluates Logistic Regression models with different max_iter values on the provided datasets.
+
+    Parameters:
+    :param: X_train : Training data features.
+    :param: X_val : Validation data features.
+    :param: X_test : Test data features.
+    :param: y_train : Training data labels.
+    :param: y_val : Validation data labels.
+    :param: y_test : Test data labels.
+
+    :returns: Predictions for the validation data using the best model.
+    """
+    for i in range(20, 150, 30):
+        model_lr = LogisticRegression(max_iter=i)
+        model_lr_fit = model_lr.fit(X_train, y_train)
+        model_lr_pred = model_lr.predict(X_val)
+        model_lr_t = model_lr.predict(X_train)
+        # Accuracy of Model
+        acc_lr = accuracy_score(y_val, model_lr_pred)
+        acc_lr_t = accuracy_score(y_train, model_lr_t)
+        print(str(i) + " iterations: Validation set - The Accuracy score is: " + str(round(acc_lr, 3) * 100) + "%")
+
+        print(str(i) + " iterations: Training set - The Accuracy score is: " + str(round(acc_lr_t, 3) * 100) + "%")
+
+    return model_lr_pred
+
 if __name__ == '__main__':
     df = load_and_prepare_cifar_data()
     X_train, X_test, y_train, y_test = split_data(df)
@@ -262,21 +296,35 @@ if __name__ == '__main__':
     # Normalize the data
     normalize_data(X_train, X_val, X_test)
 
+    # Standardize the data
+    scaler = StandardScaler()
+    X_train = scaler.fit_transform(X_train)
+    X_val = scaler.transform(X_val)
+    X_test = scaler.transform(X_test)
+
     # Reshape the data
-    X_train_rgb = X_train.to_numpy().reshape(X_train.shape[0], -1)
-    X_val_rgb = X_val.to_numpy().reshape(X_val.shape[0], -1)
-    X_test_rgb = X_test.to_numpy().reshape(X_test.shape[0], -1)
+    X_train_rgb = X_train.reshape(X_train.shape[0], -1)
+    X_val_rgb = X_val.reshape(X_val.shape[0], -1)
+    X_test_rgb = X_test.reshape(X_test.shape[0], -1)
 
     # Convert labels from a 2D array to 1D array
     y_train = np.squeeze(y_train)
     y_val = np.squeeze(y_val)
     y_test = np.squeeze(y_test)
 
-    # Run KNN and get predictions
-    model_knn_pred = KNN(X_train_rgb, X_val_rgb, y_train, y_val)
+    ###################### KNN ######################
 
-    # Class names for CIFAR-10
-    class_names = ['airplane', 'automobile', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse', 'ship', 'truck']
+    # # Run KNN and get predictions
+    # model_knn_pred = KNN(X_train_rgb, X_val_rgb, y_train, y_val)
+    #
+    # # Plot the confusion matrix
+    # plot_confusion_matrix(y_val, model_knn_pred, CLASS_NAMES)
+
+    ###################### Logistic Regression ######################
+
+    # Train Logistic Regression and get predictions
+    model_lr_pred = logistic_regression(X_train_rgb, X_val_rgb, X_test_rgb, y_train, y_val, y_test)
 
     # Plot the confusion matrix
-    plot_confusion_matrix(y_val, model_knn_pred, class_names)
+    plot_confusion_matrix(y_val, model_lr_pred, CLASS_NAMES)
+
