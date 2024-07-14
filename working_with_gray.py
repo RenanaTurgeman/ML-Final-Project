@@ -44,7 +44,7 @@ if __name__ == '__main__':
     df_gray['label'] = df['label']
 
     # Visualize the grayscale images
-    visualize_grayscale_images(X_gray, df_gray['label'].values)
+    # visualize_grayscale_images(X_gray, df_gray['label'].values)
 
     X_train, X_test, y_train, y_test = split_data(df_gray)
 
@@ -72,11 +72,11 @@ if __name__ == '__main__':
 
     ###################### KNN ######################
 
-    # # Run KNN and get predictions
-    # model_knn_pred = KNN(X_train_gray, X_val_gray, y_train, y_val)
-    #
-    # # Plot the confusion matrix
-    # plot_confusion_matrix(y_val, model_knn_pred, CLASS_NAMES)
+    # Run KNN and get predictions
+    model_knn_pred = KNN(X_train_gray, X_val_gray, y_train, y_val)
+
+    # Plot the confusion matrix
+    plot_confusion_matrix(y_val, model_knn_pred, CLASS_NAMES)
 
     ###################### Logistic Regression ######################
 
