@@ -1,3 +1,4 @@
+import numpy as np
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.metrics import accuracy_score
 import matplotlib.pyplot as plt
@@ -5,6 +6,10 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.svm import SVC
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.model_selection import GridSearchCV
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense
+from tensorflow.keras.utils import to_categorical
+
 def KNN(train, val, y_train, y_val):
     """
     Performs K-Nearest Neighbors classification on the provided training and validation datasets.
@@ -215,3 +220,55 @@ def decision_tree(X_train, X_val, X_test, y_train, y_val, y_test):
     print(f"Validation Accuracy = {val_accuracy:.4f}, Test Accuracy = {test_accuracy:.4f}")
 
     return model_dt_pred_val
+
+def CNN(X_train, X_val, X_test, y_train, y_val, y_test, input_shape, num_classes):
+    """
+    Trains and evaluates a Convolutional Neural Network (CNN) on the provided datasets.
+
+    :param: X_train : Training data features.
+    :param: X_val : Validation data features.
+    :param: X_test : Test data features.
+    :param: y_train : Training data labels.
+    :param: y_val : Validation data labels.
+    :param: y_test : Test data labels.
+    :param: input_shape : Shape of the input data (height, width, channels).
+    :param: num_classes : Number of classes.
+
+    :returns: Predictions for the validation data using the trained CNN model.
+    """
+
+    # Convert labels to one-hot encoding
+    y_train = to_categorical(y_train, num_classes)
+    y_val = to_categorical(y_val, num_classes)
+    y_test = to_categorical(y_test, num_classes)
+
+    # Initialize the CNN model
+    model = Sequential()
+    model.add(Conv2D(32, (3, 3), activation='relu', input_shape=input_shape))
+    model.add(MaxPooling2D((2, 2)))
+    model.add(Conv2D(64, (3, 3), activation='relu'))
+    model.add(MaxPooling2D((2, 2)))
+    model.add(Conv2D(64, (3, 3), activation='relu'))
+    model.add(Flatten())
+    model.add(Dense(64, activation='relu'))
+    model.add(Dense(num_classes, activation='softmax'))
+
+    # Compile the model
+    model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
+
+    # Train the model
+    model.fit(X_train, y_train, epochs=10, batch_size=64, validation_data=(X_val, y_val))
+
+    # Evaluate the model
+    val_loss, val_accuracy = model.evaluate(X_val, y_val)
+    test_loss, test_accuracy = model.evaluate(X_test, y_test)
+
+    print(f"Validation Accuracy = {val_accuracy:.4f}, Test Accuracy = {test_accuracy:.4f}")
+
+    # Predict on the validation data
+    model_cnn_pred_val = model.predict(X_val)
+
+    # Convert predictions back to label format
+    model_cnn_pred_val = np.argmax(model_cnn_pred_val, axis=1)
+
+    return model_cnn_pred_val

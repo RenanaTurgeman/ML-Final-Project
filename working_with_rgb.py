@@ -112,14 +112,14 @@ if __name__ == '__main__':
 
     ###################### SVM WITH GridSearchCV ######################
 
-    # Train SVM and get the best model
-    best_svm_model, best_val_accuracy = SVM_with_GridSearchCV(X_train_rgb, y_train)
-
-    # Predict on the validation data using the best model
-    model_svm_pred_val = best_svm_model.predict(X_val_rgb)
-
-    # Plot the confusion matrix for the best model
-    plot_confusion_matrix(y_val, model_svm_pred_val, CLASS_NAMES)
+    # # Train SVM and get the best model
+    # best_svm_model, best_val_accuracy = SVM_with_GridSearchCV(X_train_rgb, y_train)
+    #
+    # # Predict on the validation data using the best model
+    # model_svm_pred_val = best_svm_model.predict(X_val_rgb)
+    #
+    # # Plot the confusion matrix for the best model
+    # plot_confusion_matrix(y_val, model_svm_pred_val, CLASS_NAMES)
 
     ############### Decision Tree ######################
     # Train Decision Tree and get predictions
@@ -127,3 +127,21 @@ if __name__ == '__main__':
     #
     # # Plot the confusion matrix
     # plot_confusion_matrix(y_val, model_dt_pred, CLASS_NAMES)
+
+    ###################### CNN ######################
+
+    # Reshape the data for CNN
+    X_train_cnn = X_train.reshape(X_train.shape[0], 32, 32, 3)
+    X_val_cnn = X_val.reshape(X_val.shape[0], 32, 32, 3)
+    X_test_cnn = X_test.reshape(X_test.shape[0], 32, 32, 3)
+
+    # Define the input shape and number of classes
+    input_shape = (32, 32, 3)
+    num_classes = 10
+
+    # Train CNN and get predictions
+    model_cnn_pred = CNN(X_train_cnn, X_val_cnn, X_test_cnn, y_train, y_val, y_test, input_shape, num_classes)
+
+    # Plot the confusion matrix
+    plot_confusion_matrix(y_val, model_cnn_pred, CLASS_NAMES)
+
