@@ -7,8 +7,16 @@ from sklearn.svm import SVC
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.model_selection import GridSearchCV
 from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense
 from tensorflow.keras.utils import to_categorical
+import matplotlib.pyplot as plt
+import numpy as np
+from tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense, Dropout, BatchNormalization
+import matplotlib.pyplot as plt
+import numpy as np
+from sklearn.metrics import confusion_matrix, accuracy_score
+from tensorflow.keras.datasets import cifar10
+from tensorflow.keras.utils import to_categorical
+from tensorflow.keras import layers, models, optimizers
 
 def KNN(train, val, y_train, y_val):
     """
@@ -257,13 +265,22 @@ def CNN(X_train, X_val, X_test, y_train, y_val, y_test, input_shape, num_classes
     model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
 
     # Train the model
-    model.fit(X_train, y_train, epochs=10, batch_size=64, validation_data=(X_val, y_val))
+    history = model.fit(X_train, y_train, epochs=10, batch_size=64, validation_data=(X_val, y_val), verbose=1)
 
     # Evaluate the model
     val_loss, val_accuracy = model.evaluate(X_val, y_val)
     test_loss, test_accuracy = model.evaluate(X_test, y_test)
 
     print(f"Validation Accuracy = {val_accuracy:.4f}, Test Accuracy = {test_accuracy:.4f}")
+
+    # Plotting validation vs test accuracy
+    plt.plot(history.history['accuracy'], label='Train Accuracy')
+    plt.plot(history.history['val_accuracy'], label='Validation Accuracy')
+    plt.title('Model Accuracy')
+    plt.xlabel('Epoch')
+    plt.ylabel('Accuracy')
+    plt.legend()
+    plt.show()
 
     # Predict on the validation data
     model_cnn_pred_val = model.predict(X_val)
@@ -272,3 +289,86 @@ def CNN(X_train, X_val, X_test, y_train, y_val, y_test, input_shape, num_classes
     model_cnn_pred_val = np.argmax(model_cnn_pred_val, axis=1)
 
     return model_cnn_pred_val
+
+
+import matplotlib.pyplot as plt
+import numpy as np
+from sklearn.metrics import confusion_matrix, accuracy_score
+from tensorflow.keras.datasets import cifar10
+from tensorflow.keras.utils import to_categorical
+from tensorflow.keras import layers, models, optimizers
+
+def improved_CNN(x_train, x_val, y_train, y_val):
+    """
+    Trains and evaluates a revised Convolutional Neural Network (CNN) on CIFAR-10 dataset.
+
+    :param x_train: Training data features.
+    :param x_val: Validation data features.
+    :param y_train: Training data labels.
+    :param y_val: Validation data labels.
+
+    :return: Validation accuracy of the trained CNN model.
+    """
+    # Convert labels to one-hot encoding
+    y_train = to_categorical(y_train, 10)
+    y_val = to_categorical(y_val, 10)
+
+    # Define the revised CNN model
+    model_revised3 = models.Sequential([
+        layers.Conv2D(32, (3, 3), activation='relu', padding='same', input_shape=(32, 32, 3)),
+        layers.BatchNormalization(),
+        layers.MaxPooling2D((2, 2)),
+
+        layers.Conv2D(64, (3, 3), activation='relu', padding='same'),
+        layers.BatchNormalization(),
+        layers.Conv2D(64, (3, 3), activation='relu', padding='same'),
+        layers.BatchNormalization(),
+        layers.MaxPooling2D((2, 2)),
+        tf.keras.layers.Dropout(0.3),
+
+        layers.Conv2D(128, (3, 3), activation='relu', padding='same'),
+        layers.BatchNormalization(),
+        layers.Conv2D(128, (3, 3), activation='relu', padding='same'),
+        layers.BatchNormalization(),
+        layers.MaxPooling2D((2, 2)),
+
+        layers.Flatten(),
+
+        layers.Dense(256, activation='relu'),
+        layers.BatchNormalization(),
+        tf.keras.layers.Dropout(0.5),
+        layers.Dense(10, activation='softmax')
+    ])
+
+    # Compile the model
+    model_revised3.compile(optimizer='adam',
+                          loss='categorical_crossentropy',
+                          metrics=['accuracy'])
+
+    # Print the model summary
+    model_revised3.summary()
+
+    # Train the model
+    history_revised = model_revised3.fit(x_train, y_train, epochs=10, batch_size=64, validation_data=(x_val, y_val))
+
+    # Plotting the training and validation accuracy over epochs
+    plt.plot(history_revised.history['accuracy'], label='Train Accuracy')
+    plt.plot(history_revised.history['val_accuracy'], label='Validation Accuracy')
+    plt.title('Model Accuracy')
+    plt.xlabel('Epoch')
+    plt.ylabel('Accuracy')
+    plt.legend()
+    plt.show()
+
+    # Make predictions on the validation data
+    cnn_revised_val_pred = model_revised3.predict(x_val)
+
+    # Convert the one-hot encoded predictions back to regular labels
+    cnn_revised_val_pred = np.argmax(cnn_revised_val_pred, axis=1)
+    y_val_labels = np.argmax(y_val, axis=1)
+
+    # Calculate the accuracy score
+    cnn_revised_val_acc = accuracy_score(y_val_labels, cnn_revised_val_pred)
+    print('Revised CNN with Batch Normalization and fewer pooling layers validation accuracy:', cnn_revised_val_acc)
+
+    return cnn_revised_val_acc
