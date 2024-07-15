@@ -17,6 +17,7 @@ from sklearn.metrics import confusion_matrix, accuracy_score
 from tensorflow.keras.datasets import cifar10
 from tensorflow.keras.utils import to_categorical
 from tensorflow.keras import layers, models, optimizers
+import tensorflow as tf
 
 def KNN(train, val, y_train, y_val):
     """

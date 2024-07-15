@@ -149,7 +149,7 @@ if __name__ == '__main__':
 
 
     # Train CNN and get predictions
-    model_cnn_improved_pred = improved_CNN(X_train_cnn, X_val_cnn, X_test_cnn, y_train, y_val, y_test, input_shape, num_classes)
+    model_cnn_improved_pred = improved_CNN(X_train, X_val, y_train, y_val)
 
     # Plot the confusion matrix
     plot_confusion_matrix(y_val, model_cnn_improved_pred, CLASS_NAMES)
