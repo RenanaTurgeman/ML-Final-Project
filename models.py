@@ -1,6 +1,5 @@
 import numpy as np
 from sklearn.neighbors import KNeighborsClassifier
-from sklearn.metrics import accuracy_score
 import matplotlib.pyplot as plt
 from sklearn.linear_model import LogisticRegression
 from sklearn.svm import SVC
@@ -13,11 +12,12 @@ import numpy as np
 from tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense, Dropout, BatchNormalization
 import matplotlib.pyplot as plt
 import numpy as np
-from sklearn.metrics import confusion_matrix, accuracy_score
 from tensorflow.keras.datasets import cifar10
 from tensorflow.keras.utils import to_categorical
 from tensorflow.keras import layers, models, optimizers
 import tensorflow as tf
+from sklearn.metrics import confusion_matrix, accuracy_score
+import numpy as np
 
 def KNN(train, val, y_train, y_val):
     """
@@ -292,10 +292,6 @@ def CNN(X_train, X_val, X_test, y_train, y_val, y_test, input_shape, num_classes
     return model_cnn_pred_val
 
 
-import tensorflow as tf
-from tensorflow.keras import layers, models
-from sklearn.metrics import confusion_matrix, accuracy_score
-import numpy as np
 
 def improved_CNN(x_train, y_train, x_val, y_val, input_shape=(32, 32, 3), num_classes=10, epochs=10, batch_size=64):
     # The revised model with batch normalization and fewer pooling layers
@@ -347,7 +343,7 @@ def improved_CNN(x_train, y_train, x_val, y_val, input_shape=(32, 32, 3), num_cl
 
     # Calculate the accuracy score
     cnn_revised_val_acc = accuracy_score(y_val_labels, cnn_revised_val_pred)
-    print('Revised CNN with Batch Normalization and fewer pooling layers validation accuracy:', cnn_revised_val_acc)
+    print('CNN accuracy:', cnn_revised_val_acc)
 
     return model_revised3, history_revised, conf_matrix_revised, cnn_revised_val_acc
 
