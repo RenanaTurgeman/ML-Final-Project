@@ -129,15 +129,15 @@ if __name__ == '__main__':
     # plot_confusion_matrix(y_val, model_dt_pred, CLASS_NAMES)
 
     ###################### CNN ######################
-
-    # Reshape the data for CNN
-    X_train_cnn = X_train.reshape(X_train.shape[0], 32, 32, 3)
-    X_val_cnn = X_val.reshape(X_val.shape[0], 32, 32, 3)
-    X_test_cnn = X_test.reshape(X_test.shape[0], 32, 32, 3)
-
-    # Define the input shape and number of classes
-    input_shape = (32, 32, 3)
-    num_classes = 10
+    #
+    # # Reshape the data for CNN
+    # X_train_cnn = X_train.reshape(X_train.shape[0], 32, 32, 3)
+    # X_val_cnn = X_val.reshape(X_val.shape[0], 32, 32, 3)
+    # X_test_cnn = X_test.reshape(X_test.shape[0], 32, 32, 3)
+    #
+    # # Define the input shape and number of classes
+    # input_shape = (32, 32, 3)
+    # num_classes = 10
 
     # # Train CNN and get predictions
     # model_cnn_pred = CNN(X_train_cnn, X_val_cnn, X_test_cnn, y_train, y_val, y_test, input_shape, num_classes)
@@ -146,10 +146,18 @@ if __name__ == '__main__':
     # plot_confusion_matrix(y_val, model_cnn_pred, CLASS_NAMES)
 
     ###################### IMPROVED CNN ######################
+    # Reshape the data for CNN
+    X_train_cnn = X_train.reshape(X_train.shape[0], 32, 32, 3)
+    X_val_cnn = X_val.reshape(X_val.shape[0], 32, 32, 3)
+    X_test_cnn = X_test.reshape(X_test.shape[0], 32, 32, 3)
 
+    # Convert labels to categorical
+    y_train_cat = tf.keras.utils.to_categorical(y_train, num_classes=10)
+    y_val_cat = tf.keras.utils.to_categorical(y_val, num_classes=10)
+    y_test_cat = tf.keras.utils.to_categorical(y_test, num_classes=10)
 
-    # Train CNN and get predictions
-    model_cnn_improved_pred = improved_CNN(X_train, X_val, y_train, y_val)
+    # Train improved CNN and get results
+    model_revised3, history_revised, conf_matrix_revised, cnn_revised_val_acc = improved_CNN(X_train_cnn, y_train_cat, X_val_cnn, y_val_cat)
 
-    # Plot the confusion matrix
-    plot_confusion_matrix(y_val, model_cnn_improved_pred, CLASS_NAMES)
+    # Plot the confusion matrix (assuming you have a function plot_confusion_matrix)
+    # plot_confusion_matrix(y_val, cnn_revised_val_pred, CLASS_NAMES)
