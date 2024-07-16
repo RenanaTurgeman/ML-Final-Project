@@ -1,4 +1,6 @@
 import numpy as np
+from keras.src.callbacks import ReduceLROnPlateau, ModelCheckpoint, EarlyStopping
+from keras.src.preprocessing.image import ImageDataGenerator
 from sklearn.neighbors import KNeighborsClassifier
 import matplotlib.pyplot as plt
 from sklearn.linear_model import LogisticRegression
@@ -330,6 +332,76 @@ def improved_CNN(x_train, y_train, x_val, y_val, input_shape=(32, 32, 3), num_cl
 
     # Train the model
     history_revised = model_revised3.fit(x_train, y_train, epochs=epochs, batch_size=batch_size, validation_data=(x_val, y_val))
+
+    # Make predictions on the validation data
+    cnn_revised_val_pred = model_revised3.predict(x_val)
+
+    # Convert the one-hot encoded back to regular labels
+    cnn_revised_val_pred = np.argmax(cnn_revised_val_pred, axis=1)
+    y_val_labels = np.argmax(y_val, axis=1)
+
+    # Calculate the confusion matrix
+    conf_matrix_revised = confusion_matrix(y_val_labels, cnn_revised_val_pred)
+
+    # Calculate the accuracy score
+    cnn_revised_val_acc = accuracy_score(y_val_labels, cnn_revised_val_pred)
+    print('CNN accuracy:', cnn_revised_val_acc)
+
+    return model_revised3, history_revised, conf_matrix_revised, cnn_revised_val_acc
+
+
+def more_improved_CNN(x_train, y_train, x_val, y_val, input_shape=(32, 32, 3), num_classes=10, epochs=50, batch_size=64):
+    # Reshape the input data to the correct format
+    x_train = x_train.reshape(-1, 32, 32, 3)
+    x_val = x_val.reshape(-1, 32, 32, 3)
+
+    # Data augmentation
+    datagen = ImageDataGenerator(
+        rotation_range=20,
+        width_shift_range=0.2,
+        height_shift_range=0.2,
+        horizontal_flip=True,
+    )
+    datagen.fit(x_train)
+
+    # Revised model
+    model_revised3 = models.Sequential([
+        layers.Conv2D(32, (3, 3), activation='relu', padding='same', input_shape=input_shape),
+        layers.BatchNormalization(),
+        layers.MaxPooling2D((2, 2)),
+        layers.Conv2D(64, (3, 3), activation='relu', padding='same'),
+        layers.BatchNormalization(),
+        layers.Conv2D(64, (3, 3), activation='relu', padding='same'),
+        layers.BatchNormalization(),
+        layers.MaxPooling2D((2, 2)),
+        tf.keras.layers.Dropout(0.3),
+        layers.Conv2D(128, (3, 3), activation='relu', padding='same'),
+        layers.BatchNormalization(),
+        layers.Conv2D(128, (3, 3), activation='relu', padding='same'),
+        layers.BatchNormalization(),
+        layers.MaxPooling2D((2, 2)),
+        layers.Flatten(),
+        layers.Dense(256, activation='relu', kernel_regularizer=tf.keras.regularizers.l2(0.001)),
+        layers.BatchNormalization(),
+        tf.keras.layers.Dropout(0.5),
+        layers.Dense(num_classes, activation='softmax')
+    ])
+
+    # Compile the model
+    model_revised3.compile(optimizer='adam',
+                           loss='categorical_crossentropy',
+                           metrics=['accuracy'])
+
+    # Callbacks
+    early_stopping = EarlyStopping(monitor='val_loss', patience=10, restore_best_weights=True)
+    model_checkpoint = ModelCheckpoint('best_model.h5', monitor='val_loss', save_best_only=True)
+    reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.5, patience=5, min_lr=0.00001)
+
+    # Train the model with data augmentation
+    history_revised = model_revised3.fit(datagen.flow(x_train, y_train, batch_size=batch_size),
+                                         epochs=epochs,
+                                         validation_data=(x_val, y_val),
+                                         callbacks=[early_stopping, model_checkpoint, reduce_lr])
 
     # Make predictions on the validation data
     cnn_revised_val_pred = model_revised3.predict(x_val)

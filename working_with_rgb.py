@@ -146,18 +146,27 @@ if __name__ == '__main__':
     # plot_confusion_matrix(y_val, model_cnn_pred, CLASS_NAMES)
 
     ###################### IMPROVED CNN ######################
-    # Reshape the data for CNN
-    X_train_cnn = X_train.reshape(X_train.shape[0], 32, 32, 3)
-    X_val_cnn = X_val.reshape(X_val.shape[0], 32, 32, 3)
-    X_test_cnn = X_test.reshape(X_test.shape[0], 32, 32, 3)
+    # # Reshape the data for CNN
+    # X_train_cnn = X_train.reshape(X_train.shape[0], 32, 32, 3)
+    # X_val_cnn = X_val.reshape(X_val.shape[0], 32, 32, 3)
+    # X_test_cnn = X_test.reshape(X_test.shape[0], 32, 32, 3)
+    #
+    # # Convert labels to categorical
+    # y_train_cat = tf.keras.utils.to_categorical(y_train, num_classes=10)
+    # y_val_cat = tf.keras.utils.to_categorical(y_val, num_classes=10)
+    # y_test_cat = tf.keras.utils.to_categorical(y_test, num_classes=10)
+    #
+    # # Train improved CNN and get results
+    # model_revised3, history_revised, conf_matrix_revised, cnn_revised_val_acc = improved_CNN(X_train_cnn, y_train_cat, X_val_cnn, y_val_cat)
+    #
+    # # Plot the confusion matrix (assuming you have a function plot_confusion_matrix)
+    # # plot_confusion_matrix(y_val, cnn_revised_val_pred, CLASS_NAMES)
 
+    ###################### MORE IMPROVED CNN ######################
     # Convert labels to categorical
-    y_train_cat = tf.keras.utils.to_categorical(y_train, num_classes=10)
-    y_val_cat = tf.keras.utils.to_categorical(y_val, num_classes=10)
-    y_test_cat = tf.keras.utils.to_categorical(y_test, num_classes=10)
+    y_train = tf.keras.utils.to_categorical(y_train, num_classes=10)
+    y_val = tf.keras.utils.to_categorical(y_val, num_classes=10)
+    y_test = tf.keras.utils.to_categorical(y_test, num_classes=10)
 
-    # Train improved CNN and get results
-    model_revised3, history_revised, conf_matrix_revised, cnn_revised_val_acc = improved_CNN(X_train_cnn, y_train_cat, X_val_cnn, y_val_cat)
-
-    # Plot the confusion matrix (assuming you have a function plot_confusion_matrix)
-    # plot_confusion_matrix(y_val, cnn_revised_val_pred, CLASS_NAMES)
+    # Train the improved CNN
+    model, history, conf_matrix, accuracy = more_improved_CNN(X_train, y_train, X_val, y_val)
