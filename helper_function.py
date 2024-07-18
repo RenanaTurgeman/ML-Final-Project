@@ -178,3 +178,18 @@ def plot_confusion_matrix(y_true, y_pred, class_names):
     plt.ylabel('True Labels')
     plt.title('Confusion Matrix')
     plt.show()
+
+def plot_class_distribution(labels):
+    """
+    Plots the distribution of the given labels.
+
+    Parameters:
+    labels: List or array of labels.
+    """
+    unique, counts = np.unique(labels, return_counts=True)
+    plt.figure(figsize=(8, 6))
+    plt.bar(unique, counts, color=['blue', 'orange'])
+    plt.xlabel('Class')
+    plt.ylabel('Count')
+    plt.title('Class Distribution')
+    plt.show()
