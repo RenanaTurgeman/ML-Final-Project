@@ -37,7 +37,7 @@ if __name__ == '__main__':
     y_test = update_labels(y_test)
 
     # Plot the distribution of the training labels
-    plot_class_distribution(y_train)
+    # plot_class_distribution(y_train)
 
     # Split data into training and validation sets
     X_train, X_val, y_train, y_val = train_test_split(X_train, y_train, test_size=0.2, random_state=42)
@@ -57,29 +57,29 @@ if __name__ == '__main__':
     ###################### KNN ######################
 
     # # Run KNN and get predictions
-    model_knn_pred = KNN(X_train_rgb, X_val_rgb, y_train, y_val)
+    # model_knn_pred = KNN(X_train_rgb, X_val_rgb, y_train, y_val)
     #
     # Convert categorical labels back to original labels for plotting confusion matrix
     y_val_decoded = [1 if label == 'animal' else 0 for label in y_val]
-    model_knn_pred_decoded = [1 if label == 'animal' else 0 for label in model_knn_pred]
+    # model_knn_pred_decoded = [1 if label == 'animal' else 0 for label in model_knn_pred]
     #
     # # Plot the confusion matrix
     # plot_confusion_matrix(y_val_decoded, model_knn_pred_decoded, ['vehicle', 'animal'])
 
     ###################### Logistic Regression ######################
 
-    # Train Logistic Regression and get predictions
-    model_lr_pred = logistic_regression(X_train_rgb, X_val_rgb, X_test_rgb, y_train, y_val, y_test)
-
-    # Convert categorical labels back to original labels for plotting confusion matrix
-    model_lr_pred_decoded = [1 if label == 'animal' else 0 for label in model_lr_pred]
-
-    # Plot the confusion matrix
-    plot_confusion_matrix(y_val_decoded, model_lr_pred_decoded, ['vehicle', 'animal'])
+    # # Train Logistic Regression and get predictions
+    # model_lr_pred = logistic_regression(X_train_rgb, X_val_rgb, X_test_rgb, y_train, y_val, y_test)
+    #
+    # # Convert categorical labels back to original labels for plotting confusion matrix
+    # model_lr_pred_decoded = [1 if label == 'animal' else 0 for label in model_lr_pred]
+    #
+    # # Plot the confusion matrix
+    # plot_confusion_matrix(y_val_decoded, model_lr_pred_decoded, ['vehicle', 'animal'])
 
     ###################### SVM ######################
 
-    # Train SVM and get predictions
+    # # Train SVM and get predictions
     # model_svm_pred = SVM(X_train_rgb, X_val_rgb, X_test_rgb, y_train, y_val, y_test)
     #
     # # Convert categorical labels back to original labels for plotting confusion matrix
@@ -112,8 +112,9 @@ if __name__ == '__main__':
     # # Plot the confusion matrix
     # plot_confusion_matrix(y_val_decoded, model_dt_pred_decoded, ['vehicle', 'animal'])
 
+
     ###################### CNN ######################
-    #
+    #  todo: fix CNN here:
     # # Reshape the data for CNN
     # X_train_cnn = X_train.reshape(X_train.shape[0], 32, 32, 3)
     # X_val_cnn = X_val.reshape(X_val.shape[0], 32, 32, 3)
@@ -122,10 +123,24 @@ if __name__ == '__main__':
     # # Define the input shape and number of classes
     # input_shape = (32, 32, 3)
     # num_classes = 2
-
+    #
+    # # Convert labels to integers
+    # label_to_int = {'animal': 0, 'vehicle': 1}
+    # y_train_int = np.array([label_to_int[label] for label in y_train])
+    # y_val_int = np.array([label_to_int[label] for label in y_val])
+    # y_test_int = np.array([label_to_int[label] for label in y_test])
+    #
+    # # Convert integer labels to categorical
+    # y_train_cat = tf.keras.utils.to_categorical(y_train_int, num_classes)
+    # y_val_cat = tf.keras.utils.to_categorical(y_val_int, num_classes)
+    # y_test_cat = tf.keras.utils.to_categorical(y_test_int, num_classes)
+    #
     # # Train CNN and get predictions
-    # model_cnn_pred = CNN(X_train_cnn, X_val_cnn, X_test_cnn, y_train, y_val, y_test, input_shape, num_classes)
+    # model_cnn_pred = CNN(X_train_cnn, X_val_cnn, X_test_cnn, y_train_cat, y_val_cat, y_test_cat, input_shape, num_classes)
     #
-    # # Convert categorical labels back to original labels for plotting confusion matrix
-    # model_cnn_pred_decoded = [1 if label == 'animal' else 0 for label in model_cnn_pred]
+    # # Convert categorical predictions back to original labels
+    # model_cnn_pred_decoded = np.argmax(model_cnn_pred, axis=1)
     #
+    # # Plot the confusion matrix
+    # plot_confusion_matrix(y_val_int, model_cnn_pred_decoded, ['animal', 'vehicle'])
+
