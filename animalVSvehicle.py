@@ -57,7 +57,7 @@ if __name__ == '__main__':
     ###################### KNN ######################
 
     # # Run KNN and get predictions
-    # model_knn_pred = KNN(X_train_rgb, X_val_rgb, y_train, y_val)
+    model_knn_pred = KNN(X_train_rgb, X_val_rgb, y_train, y_val)
     #
     # Convert categorical labels back to original labels for plotting confusion matrix
     y_val_decoded = [1 if label == 'animal' else 0 for label in y_val]

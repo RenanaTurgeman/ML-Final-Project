@@ -66,23 +66,23 @@ if __name__ == '__main__':
     pca = PCA(n_components=0.95)  # Retain 95% of variance
     X_train_pca = pca.fit_transform(X_train)
 
-    plt.plot(np.cumsum(pca.explained_variance_ratio_))
-    plt.xlabel("Number of Features")
-    plt.ylabel("The Variance")
-    plt.show()
+    # plt.plot(np.cumsum(pca.explained_variance_ratio_))
+    # plt.xlabel("Number of Features")
+    # plt.ylabel("The Variance")
+    # plt.show()
 
     X_val_pca = pca.transform(X_val)
     X_test_pca = pca.transform(X_test)
 
-    # Reshape the data (if needed for certain models, here we assume it is already in correct shape)
-    X_train_rgb = X_train_pca
-    X_val_rgb = X_val_pca
-    X_test_rgb = X_test_pca
-
-    # Convert labels from a 2D array to 1D array
-    y_train = np.squeeze(y_train)
-    y_val = np.squeeze(y_val)
-    y_test = np.squeeze(y_test)
+    # Visualize eigenvalues to show noise reduction
+    eigenvalues = pca.explained_variance_
+    plt.figure(figsize=(8, 6))
+    plt.plot(eigenvalues, marker='o')
+    plt.xlabel("Principal Component Index")
+    plt.ylabel("Eigenvalue")
+    plt.title("Eigenvalues of Principal Components")
+    plt.grid(True)
+    plt.show()
 
     ###################### KNN ######################
 
