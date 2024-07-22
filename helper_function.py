@@ -134,9 +134,53 @@ def load_and_prepare_cifar_data(dataset_path='./cifar-10-batches-py'):
 
     return df
 
-
-# df = load_and_prepare_cifar_data()
-# print(df)
+# def load_and_prepare_cifar_data(dataset_path='./cifar-10-batches-py'):
+#     """
+#     Loads and preprocesses the CIFAR-10 dataset from the specified directory.
+#
+#     :param dataset_path: Optional path to the CIFAR-10 dataset folder. Default is './cifar-10-batches-py'.
+#     :returns: pd.DataFrame
+#         A DataFrame containing the flattened image data and their corresponding labels.
+#     """
+#     data_list = []
+#
+#     # Loop through each batch file and load the data
+#     for i in range(1, 6):
+#         batch_file_path = os.path.join(dataset_path, f'data_batch_{i}')
+#         batch_data = load_cifar_batch(batch_file_path)
+#
+#         # Extract the pixel data and labels from the batch
+#         pixel_data = batch_data[b'data']
+#         labels = batch_data[b'labels']
+#
+#         # Convert pixel data to images and flatten them
+#         num_images = pixel_data.shape[0]
+#         image_size = 32 * 32 * 3  # CIFAR-10 images are 32x32 with 3 color channels
+#
+#         flattened_images = []
+#         for image in pixel_data:
+#             # Convert the flat array into an image
+#             image_array = np.array(image, dtype=np.uint8).reshape(32, 32, 3)
+#             image_pil = Image.fromarray(image_array)
+#
+#             # Flatten the image to a vector
+#             flattened_image = np.array(image_pil).flatten()
+#             flattened_images.append(flattened_image)
+#
+#         # Convert the list of flattened images to a NumPy array
+#         flattened_images = np.array(flattened_images)
+#
+#         # Create a DataFrame with flattened images and labels
+#         df_batch = pd.DataFrame(flattened_images)
+#         df_batch['label'] = labels
+#
+#         # Append the batch data to the data_list
+#         data_list.append(df_batch)
+#
+#     # Concatenate all batch DataFrames into a single DataFrame
+#     df = pd.concat(data_list, ignore_index=True)
+#
+#     return df
 
 def split_data(df, test_size=0.2):
     """
