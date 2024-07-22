@@ -86,25 +86,6 @@ if __name__ == '__main__':
     # # Plot the confusion matrix
     # plot_confusion_matrix(y_val, model_lr_pred, CLASS_NAMES)
 
-    ###################### SVM ######################
-
-    # # Train SVM and get predictions
-    # model_svm_pred = SVM(X_train_gray, X_val_gray, X_test_gray, y_train, y_val, y_test)
-    #
-    # # Plot the confusion matrix
-    # plot_confusion_matrix(y_val, model_svm_pred, CLASS_NAMES)
-
-    ###################### SVM WITH GridSearchCV ######################
-
-    # Train SVM and get the best model
-    best_svm_model, best_val_accuracy = SVM_with_GridSearchCV(X_train_gray, y_train)
-
-    # Predict on the validation data using the best model
-    model_svm_pred_val = best_svm_model.predict(X_val_gray)
-
-    # Plot the confusion matrix for the best model
-    plot_confusion_matrix(y_val, model_svm_pred_val, CLASS_NAMES)
-
     ############### Decision Tree ######################
     # Train Decision Tree and get predictions
     # model_dt_pred = decision_tree(X_train_gray, X_val_gray, X_test_gray, y_train, y_val, y_test)

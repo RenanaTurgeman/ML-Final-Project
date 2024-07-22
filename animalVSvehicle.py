@@ -77,31 +77,6 @@ if __name__ == '__main__':
     # # Plot the confusion matrix
     # plot_confusion_matrix(y_val_decoded, model_lr_pred_decoded, ['vehicle', 'animal'])
 
-    ###################### SVM ######################
-
-    # # Train SVM and get predictions
-    # model_svm_pred = SVM(X_train_rgb, X_val_rgb, X_test_rgb, y_train, y_val, y_test)
-    #
-    # # Convert categorical labels back to original labels for plotting confusion matrix
-    # model_svm_pred_decoded = [1 if label == 'animal' else 0 for label in model_svm_pred]
-    #
-    # # Plot the confusion matrix
-    # plot_confusion_matrix(y_val_decoded, model_svm_pred_decoded, ['vehicle', 'animal'])
-
-    ###################### SVM WITH GridSearchCV ######################
-
-    # Train SVM and get the best model
-    # best_svm_model, best_val_accuracy = SVM_with_GridSearchCV(X_train_rgb, y_train)
-    #
-    # # Predict on the validation data using the best model
-    # model_svm_pred_val = best_svm_model.predict(X_val_rgb)
-    #
-    # # Convert categorical labels back to original labels for plotting confusion matrix
-    # model_svm_pred_val_decoded = [1 if label == 'animal' else 0 for label in model_svm_pred_val]
-    #
-    # # Plot the confusion matrix for the best model
-    # plot_confusion_matrix(y_val_decoded, model_svm_pred_val_decoded, ['vehicle', 'animal'])
-
     ############### Decision Tree ######################
     # Train Decision Tree and get predictions
     # model_dt_pred = decision_tree(X_train_rgb, X_val_rgb, X_test_rgb, y_train, y_val, y_test)

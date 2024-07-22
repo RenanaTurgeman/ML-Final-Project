@@ -1,8 +1,8 @@
 import matplotlib.pyplot as plt
 
-categories = ['KNN', 'Logistic Regression', 'SVM', 'Decision Tree']
-accuracy_color = [0.32,  0.3465,  0.4274,  0.2590]
-accuracy_gray = [0.28, 0.2645, 0.3522, 0.2152]
+categories = ['KNN', 'Logistic Regression', 'Decision Tree']
+accuracy_color = [0.32,  0.3465,  0.2590]
+accuracy_gray = [0.28, 0.2645, 0.2152]
 
 fig, ax = plt.subplots()
 width = 0.35
