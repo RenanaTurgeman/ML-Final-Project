@@ -326,3 +326,52 @@ def more_improved_CNN(x_train, y_train, x_val, y_val, input_shape=(32, 32, 3), n
 
     return model_revised3, history_revised, conf_matrix_revised, cnn_revised_val_acc
 
+
+
+def more_improved_CNN_with_vgg16(x_train, y_train, x_val, y_val, input_shape=(512,), num_classes=10, epochs=50, batch_size=64):
+    # Update the input shape to match the feature size
+    input_shape = (x_train.shape[1],)  # Assuming the features are 1D vectors
+
+    # Define the model
+    model_revised3 = models.Sequential([
+        layers.Dense(512, activation='relu', input_shape=input_shape),
+        layers.BatchNormalization(),
+        layers.Dropout(0.3),
+        layers.Dense(256, activation='relu'),
+        layers.BatchNormalization(),
+        layers.Dropout(0.5),
+        layers.Dense(num_classes, activation='softmax')
+    ])
+
+    # Compile the model
+    model_revised3.compile(optimizer='adam',
+                           loss='categorical_crossentropy',
+                           metrics=['accuracy'])
+
+    # Callbacks
+    early_stopping = EarlyStopping(monitor='val_loss', patience=10, restore_best_weights=True)
+    model_checkpoint = ModelCheckpoint('best_model.h5', monitor='val_loss', save_best_only=True)
+    reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.5, patience=5, min_lr=0.00001)
+
+    # Train the model
+    history_revised = model_revised3.fit(x_train, y_train,
+                                         epochs=epochs,
+                                         batch_size=batch_size,
+                                         validation_data=(x_val, y_val),
+                                         callbacks=[early_stopping, model_checkpoint, reduce_lr])
+
+    # Make predictions on the validation data
+    cnn_revised_val_pred = model_revised3.predict(x_val)
+
+    # Convert the one-hot encoded back to regular labels
+    cnn_revised_val_pred = np.argmax(cnn_revised_val_pred, axis=1)
+    y_val_labels = np.argmax(y_val, axis=1)
+
+    # Calculate the confusion matrix
+    conf_matrix_revised = confusion_matrix(y_val_labels, cnn_revised_val_pred)
+
+    # Calculate the accuracy score
+    cnn_revised_val_acc = accuracy_score(y_val_labels, cnn_revised_val_pred)
+    print('CNN accuracy:', cnn_revised_val_acc)
+
+    return model_revised3, history_revised, conf_matrix_revised, cnn_revised_val_acc

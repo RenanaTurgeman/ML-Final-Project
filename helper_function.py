@@ -7,6 +7,8 @@ import tarfile
 import pickle
 import os
 from PIL import Image
+from keras import Model
+from keras.src.applications import VGG16
 from sklearn.model_selection import train_test_split
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.metrics import accuracy_score
@@ -19,6 +21,9 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.svm import SVC
 from sklearn.tree import DecisionTreeClassifier
 from models import *
+import os
+from tensorflow.keras.applications import VGG16
+from tensorflow.keras.applications.vgg16 import preprocess_input
 
 ################ HELPER FUNCTIONS ##################
 def load_cifar_batch(file_path):
@@ -124,6 +129,58 @@ def load_and_prepare_cifar_data(dataset_path='./cifar-10-batches-py'):
 
         # Create a DataFrame with flattened images and labels
         df_batch = pd.DataFrame(flattened_images)
+        df_batch['label'] = labels
+
+        # Append the batch data to the data_list
+        data_list.append(df_batch)
+
+    # Concatenate all batch DataFrames into a single DataFrame
+    df = pd.concat(data_list, ignore_index=True)
+
+    return df
+
+
+def load_and_prepare_cifar_data_using_vgg16(dataset_path='./cifar-10-batches-py'):
+    """
+    Loads and preprocesses the CIFAR-10 dataset from the specified directory using VGG16 for feature extraction.
+
+    :param: dataset_path :  optional -
+        The path to the CIFAR-10 dataset folder. Default is './cifar-10-batches-py'.
+
+    :returns: pd.DataFrame
+        A DataFrame containing the extracted features from VGG16 and their corresponding labels.
+    """
+    data_list = []
+
+    # Load the VGG16 model with pre-trained weights and exclude the top layer
+    base_model = VGG16(weights='imagenet', include_top=False, input_shape=(32, 32, 3))
+    model = Model(inputs=base_model.input, outputs=base_model.output)
+
+    # Loop through each batch file and load the data
+    for i in range(1, 6):
+        batch_file_path = os.path.join(dataset_path, f'data_batch_{i}')
+        batch_data = load_cifar_batch(batch_file_path)
+
+        # Extract the pixel data and labels from the batch
+        pixel_data = batch_data[b'data']
+        labels = batch_data[b'labels']
+
+        # Reshape the pixel data into image format
+        images = pixel_data.reshape((-1, 3, 32, 32)).transpose(0, 2, 3, 1)
+
+        # Preprocess images for VGG16
+        images = preprocess_input(images)
+
+        # Extract features using VGG16
+        features = model.predict(images)
+
+        # Flatten features to create feature vectors
+        num_images = features.shape[0]
+        feature_size = features.shape[1] * features.shape[2] * features.shape[3]
+        flattened_features = features.reshape(num_images, feature_size)
+
+        # Create a DataFrame with flattened features and labels
+        df_batch = pd.DataFrame(flattened_features)
         df_batch['label'] = labels
 
         # Append the batch data to the data_list

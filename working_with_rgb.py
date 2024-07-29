@@ -48,7 +48,8 @@ with tarfile.open("cifar-10-python.tar.gz", "r:gz") as tar:
 
 
 if __name__ == '__main__':
-    df = load_and_prepare_cifar_data()
+    # df = load_and_prepare_cifar_data()
+    df = load_and_prepare_cifar_data_using_vgg16()
     X_train, X_test, y_train, y_test = split_data(df)
 
     # Print the shapes of the resulting datasets
@@ -76,17 +77,21 @@ if __name__ == '__main__':
     X_val = scaler.transform(X_val)
     X_test = scaler.transform(X_test)
 
-    # Reshape the data
-    X_train_rgb = X_train.reshape(X_train.shape[0], -1)
-    X_val_rgb = X_val.reshape(X_val.shape[0], -1)
-    X_test_rgb = X_test.reshape(X_test.shape[0], -1)
+    # # Reshape the data
+    # X_train_rgb = X_train.reshape(X_train.shape[0], -1)
+    # X_val_rgb = X_val.reshape(X_val.shape[0], -1)
+    # X_test_rgb = X_test.reshape(X_test.shape[0], -1)
+
+    X_train_rgb = X_train  # Already in feature form
+    X_val_rgb = X_val      # Already in feature form
+    X_test_rgb = X_test    # Already in feature form
 
     # Convert labels from a 2D array to 1D array
     y_train = np.squeeze(y_train)
     y_val = np.squeeze(y_val)
     y_test = np.squeeze(y_test)
 
-    ###################### KNN ######################
+###################### KNN ######################
 
     # # Run KNN and get predictions
     # model_knn_pred = KNN(X_train_rgb, X_val_rgb, y_train, y_val)
@@ -150,4 +155,6 @@ if __name__ == '__main__':
     y_test = tf.keras.utils.to_categorical(y_test, num_classes=10)
 
     # Train the improved CNN
-    model, history, conf_matrix, accuracy = more_improved_CNN(X_train, y_train, X_val, y_val)
+    # model, history, conf_matrix, accuracy = more_improved_CNN(X_train, y_train, X_val, y_val)
+    model, history, conf_matrix, accuracy = more_improved_CNN_with_vgg16(X_train, y_train, X_val, y_val)
+
