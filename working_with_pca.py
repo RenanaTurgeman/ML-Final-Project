@@ -56,7 +56,7 @@ if __name__ == '__main__':
     # Normalize the data
     normalize_data(X_train, X_val, X_test)
 
-    # Standardize the data
+    # Standardizes the data to have a mean of 0 and a standard deviation of 1.
     scaler = StandardScaler()
     X_train = scaler.fit_transform(X_train)
     X_val = scaler.transform(X_val)

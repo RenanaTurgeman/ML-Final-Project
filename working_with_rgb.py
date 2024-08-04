@@ -48,8 +48,8 @@ with tarfile.open("cifar-10-python.tar.gz", "r:gz") as tar:
 
 
 if __name__ == '__main__':
-    # df = load_and_prepare_cifar_data()
-    df = load_and_prepare_cifar_data_using_vgg16()
+    df = load_and_prepare_cifar_data()
+    # df = load_and_prepare_cifar_data_using_vgg16()
     X_train, X_test, y_train, y_test = split_data(df)
 
     # Print the shapes of the resulting datasets
@@ -78,13 +78,13 @@ if __name__ == '__main__':
     X_test = scaler.transform(X_test)
 
     # # Reshape the data
-    # X_train_rgb = X_train.reshape(X_train.shape[0], -1)
-    # X_val_rgb = X_val.reshape(X_val.shape[0], -1)
-    # X_test_rgb = X_test.reshape(X_test.shape[0], -1)
+    X_train_rgb = X_train.reshape(X_train.shape[0], -1)
+    X_val_rgb = X_val.reshape(X_val.shape[0], -1)
+    X_test_rgb = X_test.reshape(X_test.shape[0], -1)
 
-    X_train_rgb = X_train  # Already in feature form
-    X_val_rgb = X_val      # Already in feature form
-    X_test_rgb = X_test    # Already in feature form
+    # X_train_rgb = X_train  # Already in feature form
+    # X_val_rgb = X_val      # Already in feature form
+    # X_test_rgb = X_test    # Already in feature form
 
     # Convert labels from a 2D array to 1D array
     y_train = np.squeeze(y_train)

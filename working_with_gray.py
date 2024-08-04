@@ -16,11 +16,6 @@ with open("cifar-10-python.tar.gz", "wb") as file:
 with tarfile.open("cifar-10-python.tar.gz", "r:gz") as tar:
     tar.extractall()
 
-def rgb2gray(rgb):
-    """
-    Convert RGB image to grayscale.
-    """
-    return np.dot(rgb[...,:3], [0.2989, 0.5870, 0.1140])
 
 def visualize_grayscale_images(X_gray, y, num_images=10):
     """
@@ -44,7 +39,7 @@ if __name__ == '__main__':
     df_gray['label'] = df['label']
 
     # Visualize the grayscale images
-    # visualize_grayscale_images(X_gray, df_gray['label'].values)
+    visualize_grayscale_images(X_gray, df_gray['label'].values)
 
     X_train, X_test, y_train, y_test = split_data(df_gray)
 
@@ -70,9 +65,10 @@ if __name__ == '__main__':
     y_val = np.squeeze(y_val)
     y_test = np.squeeze(y_test)
 
+
     ###################### KNN ######################
 
-    # # Run KNN and get predictions
+    # Run KNN and get predictions
     # model_knn_pred = KNN(X_train_gray, X_val_gray, y_train, y_val)
     #
     # # Plot the confusion matrix
