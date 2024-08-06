@@ -48,10 +48,17 @@ with tarfile.open("cifar-10-python.tar.gz", "r:gz") as tar:
 
 
 if __name__ == '__main__':
-    df = load_and_prepare_cifar_data()
+    # df = load_and_prepare_cifar_data()
     # df = load_and_prepare_cifar_data_using_vgg16()
-    X_train, X_test, y_train, y_test = split_data(df)
+    # X_train, X_test, y_train, y_test = split_data(df)
 
+    data_array, labels_array = load_and_prepare_cifar_data_hdf5()
+
+    # המרת המערכים ל-DataFrame
+    df = pd.DataFrame(data_array)
+    df['label'] = labels_array
+
+    X_train, X_test, y_train, y_test = split_data(df)
     # Print the shapes of the resulting datasets
     # print(f"X_train shape: {X_train.shape}")
     # print(f"X_test shape: {X_test.shape}")

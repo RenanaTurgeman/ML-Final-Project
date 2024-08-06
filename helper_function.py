@@ -24,6 +24,7 @@ from models import *
 import os
 from tensorflow.keras.applications import VGG16
 from tensorflow.keras.applications.vgg16 import preprocess_input
+import h5py
 
 ################ HELPER FUNCTIONS ##################
 def load_cifar_batch(file_path):
@@ -139,6 +140,32 @@ def load_and_prepare_cifar_data(dataset_path='./cifar-10-batches-py'):
 
     return df
 
+def load_and_prepare_cifar_data_hdf5(dataset_path='./cifar-10-batches-py', save_path='./cifar_data.h5'):
+    data_list = []
+    labels_list = []
+
+    for i in range(1, 6):
+        batch_file_path = os.path.join(dataset_path, f'data_batch_{i}')
+        batch_data = load_cifar_batch(batch_file_path)
+
+        pixel_data = batch_data[b'data']
+        labels = batch_data[b'labels']
+
+        images = pixel_data.reshape((-1, 3, 32, 32)).transpose(0, 2, 3, 1)
+        flattened_images = images.reshape(images.shape[0], -1)
+
+        data_list.append(flattened_images)
+        labels_list.append(labels)
+
+    data_array = np.concatenate(data_list, axis=0)
+    labels_array = np.concatenate(labels_list, axis=0)
+
+    # שמירת הווקטורים והתוויות בקובץ HDF5
+    with h5py.File(save_path, 'w') as hf:
+        hf.create_dataset('features', data=data_array)
+        hf.create_dataset('labels', data=labels_array)
+
+    return data_array, labels_array
 
 def load_and_prepare_cifar_data_using_vgg16(dataset_path='./cifar-10-batches-py'):
     """
